@@ -29,6 +29,7 @@ model Contact {
   updatedAt       DateTime  @updatedAt
   deals           Deal[]
   tasks           Task[]
+  submissions     LeadMagnetSubmission[]
 }
 
 model Stage {
@@ -73,4 +74,28 @@ model Task {
   @@index([contactId])
   @@index([dealId])
   @@index([completedAt, dueAt])
+}
+
+model LeadMagnet {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  fileUrl       String
+  coverImageUrl String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  submissions   LeadMagnetSubmission[]
+}
+
+model LeadMagnetSubmission {
+  id           String     @id @default(cuid())
+  leadMagnetId String
+  leadMagnet   LeadMagnet @relation(fields: [leadMagnetId], references: [id], onDelete: Cascade)
+  contactId    String
+  contact      Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  submittedAt  DateTime   @default(now())
+
+  @@index([leadMagnetId])
+  @@index([contactId])
 }

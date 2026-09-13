@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# lead magnet uploads (local-disk stand-in until real object storage is wired up)
+/public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
