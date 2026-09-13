@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DeleteContactButton } from "@/components/DeleteContactButton";
+import { TaskList } from "@/components/TaskList";
 
 const rowClasses = "flex gap-2 py-2";
 const labelClasses = "w-36 shrink-0 text-xs font-medium uppercase tracking-wide text-muted";
@@ -29,6 +30,12 @@ export default async function ContactDetailPage({
   if (!contact) {
     notFound();
   }
+
+  const tasks = await prisma.task.findMany({
+    where: { contactId: id, completedAt: null },
+    orderBy: { dueAt: "asc" },
+    include: { contact: true, deal: { include: { contact: true } } },
+  });
 
   return (
     <div className="max-w-2xl">
@@ -109,6 +116,23 @@ export default async function ContactDetailPage({
           <span className="whitespace-pre-wrap text-foreground">
             {contact.notes || "—"}
           </span>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Tasks
+          </h2>
+          <Link
+            href={`/tasks/new?contactId=${contact.id}`}
+            className="text-sm text-accent hover:opacity-80"
+          >
+            + Add Task
+          </Link>
+        </div>
+        <div className="mt-3">
+          <TaskList tasks={tasks} />
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatCents } from "@/lib/money";
 import { DeleteDealButton } from "@/components/DeleteDealButton";
+import { TaskList } from "@/components/TaskList";
 
 const rowClasses = "flex gap-2 py-2";
 const labelClasses =
@@ -28,6 +29,12 @@ export default async function DealDetailPage({
   if (!deal) {
     notFound();
   }
+
+  const tasks = await prisma.task.findMany({
+    where: { dealId: id, completedAt: null },
+    orderBy: { dueAt: "asc" },
+    include: { contact: true, deal: { include: { contact: true } } },
+  });
 
   return (
     <div className="max-w-2xl">
@@ -86,6 +93,23 @@ export default async function DealDetailPage({
           <span className="whitespace-pre-wrap text-foreground">
             {deal.notes || "—"}
           </span>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+            Tasks
+          </h2>
+          <Link
+            href={`/tasks/new?dealId=${deal.id}`}
+            className="text-sm text-accent hover:opacity-80"
+          >
+            + Add Task
+          </Link>
+        </div>
+        <div className="mt-3">
+          <TaskList tasks={tasks} />
         </div>
       </div>
 

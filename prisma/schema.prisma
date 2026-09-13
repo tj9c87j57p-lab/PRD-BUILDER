@@ -28,6 +28,7 @@ model Contact {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deals           Deal[]
+  tasks           Task[]
 }
 
 model Stage {
@@ -51,7 +52,25 @@ model Deal {
   stageEnteredAt    DateTime  @default(now())
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  tasks             Task[]
 
   @@index([contactId])
   @@index([stageId])
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  contactId   String?
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  dealId      String?
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  description String
+  dueAt       DateTime
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([contactId])
+  @@index([dealId])
+  @@index([completedAt, dueAt])
 }
