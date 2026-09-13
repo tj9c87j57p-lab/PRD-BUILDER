@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "bm-skills": {
+      "source": {
+        "source": "github",
+        "repo": "buildermethods/bm-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "bm-skills@bm-skills": true
+  }
+}
