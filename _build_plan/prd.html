@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Precision Coach CRM — PRD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    html { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body { font-feature-settings: "cv11", "ss01"; }
+    @media print {
+      html { background: white !important; color: black !important; color-scheme: light; }
+      html.dark { color-scheme: light; }
+      html.dark body, html.dark * { background: white !important; color: black !important; border-color: #d4d4d8 !important; }
+      .no-print { display: none !important; }
+      .print-card { break-inside: avoid; page-break-inside: avoid; }
+      header.sticky { position: static !important; backdrop-filter: none !important; }
+      main { padding-top: 0 !important; }
+      a { color: black !important; text-decoration: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased">
+  <header class="sticky top-0 z-10 backdrop-blur bg-zinc-50/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400">PRD · Precision Coach CRM</span>
+      <button id="theme-toggle" class="no-print inline-flex items-center justify-center w-9 h-9 rounded-md border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition" aria-label="Toggle theme">
+        <i data-lucide="sun" class="hidden dark:inline-block w-4 h-4"></i>
+        <i data-lucide="moon" class="inline-block dark:hidden w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-14">
+
+    <!-- DISCLAIMER (keep verbatim) -->
+    <div class="rounded-lg border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-200">
+      <p><strong class="font-semibold">About this file:</strong> Everything in <code class="font-mono text-xs">_build_plan/</code> (this PRD and the per-milestone folders) is a temporary documentation artifact for the initial build-out of this codebase. These files are not functional — no code, configuration, runtime logic, tests, or deployment process should import, read, reference, or depend on anything in <code class="font-mono text-xs">_build_plan/</code>. Once the initial milestones are built and shipped, the entire <code class="font-mono text-xs">_build_plan/</code> folder is expected to be deleted from the codebase.</p>
+    </div>
+
+    <!-- HERO -->
+    <section>
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">Precision Coach CRM</h1>
+      <p class="mt-5 text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">A private, single-owner CRM for Precision Coach's online/in-person health and fitness coaching business. It captures leads from Instagram-driven lead magnets and call bookings, moves them through a sales pipeline from first touch to closed deal, and manages the ongoing client relationship — all in one owned, on-brand system instead of a stack of rented "coach funnel" tools.</p>
+      <div class="mt-6 flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Next.js</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">TypeScript</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Tailwind CSS</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Prisma</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">PostgreSQL</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Resend</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Cloudflare R2</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">Google Calendar API</span>
+      </div>
+    </section>
+
+    <!-- WHAT THE APP DOES -->
+    <section>
+      <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>What the app does
+      </h2>
+      <ul class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 list-none p-0">
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="users" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Contacts</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Full contact records with a searchable, filterable list and a chronological activity timeline.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="dollar-sign" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Deals &amp; Kanban Pipeline</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Editable pipeline stages, drag-and-drop deal cards, and per-column plus total pipeline value.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="bell" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Follow-Ups &amp; Tasks</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Tasks on any contact or deal, plus one global "My Tasks" view with overdue items flagged.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="download" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Lead Magnet Landing Page</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">On-brand, mobile-first link-in-bio page that gates PDF downloads behind a name + email form.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="calendar" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Call Booking / Calendar</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Self-service booking against real availability, with conflict-checking and a one-way Google Calendar push.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="mail" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Lead Segmentation &amp; One-Off Email</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Filter contacts by source/tag to spot cold leads, and send a single one-off email from a contact record.</p>
+            </div>
+          </div>
+        </li>
+        <li class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 mt-0.5 w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <i data-lucide="eye" class="w-4 h-4 text-zinc-700 dark:text-zinc-300"></i>
+            </div>
+            <div>
+              <p class="font-medium text-zinc-900 dark:text-zinc-100">Dashboard Summary</p>
+              <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">At-a-glance pipeline value, tasks due today/overdue, and new leads this week.</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- OUT OF SCOPE -->
+    <section>
+      <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+        <i data-lucide="minus-circle" class="w-3.5 h-3.5"></i>Out of scope (v1)
+      </h2>
+      <ul class="mt-5 space-y-2.5 list-none p-0">
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Multi-user / team accounts</span><span class="text-zinc-500 dark:text-zinc-400"> — explicit stretch goal, not needed for a single-admin v1.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Mobile app or browser extension</span><span class="text-zinc-500 dark:text-zinc-400"> — unnecessary overhead for a single-admin web tool.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">OAuth / social login</span><span class="text-zinc-500 dark:text-zinc-400"> — one admin user; email + password is simpler and sufficient.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Custom Stripe checkout</span><span class="text-zinc-500 dark:text-zinc-400"> — existing Payment Links are linked out to directly; building custom checkout duplicates work.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Built-in bulk email marketing / automation sequences</span><span class="text-zinc-500 dark:text-zinc-400"> — a dedicated email marketing tool does this better; connect one externally if needed.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">SMS reminders (Twilio)</span><span class="text-zinc-500 dark:text-zinc-400"> — adds a new provider and cost before the core loop is proven; the due-today/overdue dashboard widget is the v1 reminder mechanism.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Two-way live Google Calendar sync</span><span class="text-zinc-500 dark:text-zinc-400"> — real-time bidirectional sync is a much heavier lift than v1 needs; a one-way push covers it.</span></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i data-lucide="x" class="w-4 h-4 mt-1 shrink-0 text-zinc-400 dark:text-zinc-600"></i>
+          <span class="text-zinc-700 dark:text-zinc-300"><span class="font-medium">Public API / advanced analytics</span><span class="text-zinc-500 dark:text-zinc-400"> — no current use case beyond the dashboard summary.</span></span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- INTEGRATIONS -->
+    <section>
+      <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+        <i data-lucide="plug" class="w-3.5 h-3.5"></i>External integrations
+      </h2>
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="plug" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Resend</h3>
+            <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">Transactional email</span>
+          </div>
+          <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Sends booking confirmations, call reminders, and one-off contact emails.</p>
+          <p class="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="key" class="w-3 h-3"></i>Credentials needed</p>
+          <ul class="mt-2 space-y-1.5 list-none p-0">
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Resend API key</li>
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Verified sending domain (precisioncoach.net DNS records)</li>
+          </ul>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="plug" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Cloudflare R2</h3>
+            <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">File storage</span>
+          </div>
+          <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Stores lead magnet PDFs and cover images. S3-compatible, no egress fees, and portable across hosts.</p>
+          <p class="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="key" class="w-3 h-3"></i>Credentials needed</p>
+          <ul class="mt-2 space-y-1.5 list-none p-0">
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Cloudflare account</li>
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>R2 API access key + secret</li>
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>R2 bucket name</li>
+          </ul>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="plug" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Google Calendar API</h3>
+            <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">Calendar push</span>
+          </div>
+          <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">Creates a matching event on your Google Calendar whenever a call is booked (one direction only, no live sync back).</p>
+          <p class="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="key" class="w-3 h-3"></i>Credentials needed</p>
+          <ul class="mt-2 space-y-1.5 list-none p-0">
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Google Cloud project</li>
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>OAuth client ID + secret</li>
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>One-time consent grant for your Google account</li>
+          </ul>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="plug" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Stripe Payment Links</h3>
+            <span class="ml-auto text-xs text-zinc-500 dark:text-zinc-400">Payments</span>
+          </div>
+          <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">The landing page links out to your existing Payment Links for checkout. No custom Stripe integration is built.</p>
+          <p class="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"><i data-lucide="key" class="w-3 h-3"></i>Credentials needed</p>
+          <ul class="mt-2 space-y-1.5 list-none p-0">
+            <li class="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300"><i data-lucide="key-round" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>None — just your existing Payment Link URLs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA MODEL -->
+    <section>
+      <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+        <i data-lucide="database" class="w-3.5 h-3.5"></i>Data model
+      </h2>
+      <p class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">What the app needs to remember.</p>
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">User</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">email</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the admin login address</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">password</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">stored securely, never in plain text</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">name</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">display name for the admin</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · none — single admin</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Contact</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">name</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the contact's name</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">email, phone</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">how to reach them</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">instagram handle</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">their @handle for DMs</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">source</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">how they came in — lead magnet, DM, referral, etc.</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">tags</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">labels for segmenting</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">notes</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">free-form notes</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">created / last contacted</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when added, and their most recent touchpoint</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · Deal, Task, ActivityLogEntry, LeadMagnetSubmission, Booking</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Deal</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">contact</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">who this deal is with</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">value</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the dollar amount of the deal</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">stage</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">where it sits in the pipeline</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">expected close date</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when it's likely to close</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">notes</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">free-form notes</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · Contact, Task, Booking</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Task</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">contact / deal</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">what this follow-up is attached to (either or both)</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">description</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the next action item</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">due date/time</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when it's due</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">completed at</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when it was marked done</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · Contact, Deal</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">ActivityLogEntry</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">contact</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">whose timeline this belongs to</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">type</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">what kind of touchpoint — call booked, email sent, stage change, note added</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">description</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">what happened</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">timestamp</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when it happened</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · Contact</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">LeadMagnet</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">title, description</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">what it's called and what it offers</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">PDF file, cover image</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the downloadable file and its listing image</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">active</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">whether it's currently listed on the page</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · LeadMagnetSubmission</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">LeadMagnetSubmission</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">lead magnet</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">which one was downloaded</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">contact</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">who downloaded it</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">submitted at</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">when the form was submitted</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · LeadMagnet, Contact</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">AvailabilityBlock</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">day of week / date</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">a recurring weekly slot, or a one-off specific date</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">start time, end time</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the open window</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · used to compute open slots for Booking</p>
+        </div>
+        <div class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <div class="flex items-center gap-2">
+            <i data-lucide="box" class="w-4 h-4 text-zinc-500 dark:text-zinc-400"></i>
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">Booking</h3>
+          </div>
+          <table class="mt-4 w-full text-sm">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">contact, deal</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">who booked, and the deal it's tied to</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">scheduled at</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">the booked call time</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">status</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">confirmed or cancelled</td></tr>
+              <tr><td class="py-2 pr-4 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 align-top whitespace-nowrap">google calendar event id</td><td class="py-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">set once the event is pushed to your calendar</td></tr>
+            </tbody>
+          </table>
+          <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-400"><span class="font-semibold uppercase tracking-[0.14em] text-[11px]">Related to</span> · Contact, Deal</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MILESTONES -->
+    <section>
+      <h2 class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+        <i data-lucide="route" class="w-3.5 h-3.5"></i>Milestones
+      </h2>
+      <div class="mt-5 space-y-5">
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">1</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Scaffold, Auth &amp; Dashboard Shell</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Stands up the Next.js app, email/password login for the single admin, and the on-brand (black background, gold/amber accent, off-white text) dashboard shell every later milestone builds inside.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Next.js + TypeScript + Tailwind project scaffold, deployable to Vercel/Railway/Render</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Prisma + PostgreSQL connection and the User model</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Email/password login for the seeded admin account (no public signup)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>On-brand dashboard shell with nav placeholders for Contacts, Deals, Tasks, Bookings, Leads</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Any real Contacts/Deals/Tasks/Booking functionality (placeholders only)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Public lead magnet page</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Any third-party integration wiring (Resend, R2, Google Calendar)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> You can log in with your admin email/password and land on the fully-themed dashboard shell with working nav to empty section placeholders.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">2</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Contacts Module</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Builds the CRM core — full contact records and a searchable, filterable list.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Create / edit / delete a Contact with all fields</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Contact list, searchable and filterable by tag, source, and deal status</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Contact detail page showing the full record</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Activity timeline rendering (Milestone 7)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Deals, tasks, or bookings UI</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> You can create a contact, see it in a searchable/filterable list, and open its full detail record.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">3</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Deals + Kanban Pipeline</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Adds the sales pipeline — deals linked to contacts, visualized as a drag-and-drop Kanban board.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Create a Deal linked to a Contact (value, stage, expected close date, notes)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Editable pipeline stages (default: New Lead → Contacted → Call Booked → Call Completed → Proposal Sent → Won → Lost)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Kanban board: one column per stage; cards show contact name, value, days in stage</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Drag-and-drop between columns, persisting the new stage</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Per-column and total pipeline value totals</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Automatic deal creation from bookings or lead magnet submissions (Milestones 5 &amp; 6)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Task/follow-up UI</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> You can create a deal, see it as a card in the right column, drag it to a new stage with the change persisting, and see correct column/total values.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">4</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Tasks + Global Dashboard</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Adds follow-up tasks on contacts and deals, plus one global view of everything due.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Add a follow-up task (description + due date/time) to any Contact or Deal</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Global "My Tasks" view: every open task, sortable by due date, overdue items flagged</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Mark a task complete; completing one optionally prompts creating the next follow-up</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Email/SMS reminder delivery — the due-today/overdue view is the v1 reminder mechanism</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Dashboard summary widget (Milestone 7)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> You can add a task to a contact or deal, see it in the global My Tasks view sorted by due date with overdue ones flagged, and mark it complete.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">5</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Lead Magnet Landing Page</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Builds the public, on-brand link-in-bio page that turns Instagram traffic into tagged Contacts.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Public page listing active lead magnets (title, description, cover image) — on-brand, mobile-first</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Name + email form gates each PDF download</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Submitting creates/updates a Contact, tags them with the lead magnet, sets source</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Featured paid-offer section linking to your existing Stripe Payment Links</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Link to the call booking page</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Admin screen to add/edit/deactivate lead magnets</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>The booking page itself (Milestone 6)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> A visitor can open the public page on mobile, submit their email, download the gated PDF, and you see a new tagged Contact appear in the CRM.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">6</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Booking / Calendar Module</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Lets visitors self-book a consultation call against your real availability, with calendar and email follow-through.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Admin screen to set recurring weekly availability and block off specific dates</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Public booking page showing open slots; visitor picks a time and submits their info</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Booking creates/updates the Contact, creates a Deal at "Call Booked" if none exists, and creates a conflict-checked Booking</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Creates a matching event on your Google Calendar (one-way push)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Confirmation email to the visitor, plus a reminder email closer to the call time</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Two-way sync — changes made in Google Calendar don't flow back</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Rescheduling flows beyond marking a booking cancelled</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> A visitor can book an open slot; you see the Contact/Deal/Booking created, a matching Google Calendar event, and they receive a confirmation email.</span></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="print-card rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <header class="flex items-center gap-3 p-5 border-b border-zinc-100 dark:border-zinc-800">
+            <span class="shrink-0 w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 flex items-center justify-center text-sm font-semibold">7</span>
+            <h3 class="font-semibold text-lg text-zinc-900 dark:text-zinc-100">Polish: Timeline, Segmentation &amp; Dashboard Summary</h3>
+          </header>
+          <div class="p-5">
+            <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed">Ties everything together with a chronological view per contact, lead follow-up tools, and an at-a-glance dashboard.</p>
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>What gets built
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Activity timeline on each Contact showing every touchpoint chronologically</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Main dashboard: total pipeline value, tasks due today/overdue, new leads this week</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>Contact segmentation view: filter by source/tag (e.g., downloaded eGuide but never booked)</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="check" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"></i><span>One-off email: send a single email to a contact from their record</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                  <i data-lucide="x-circle" class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"></i>Not in this milestone
+                </h4>
+                <ul class="mt-3 space-y-2 text-sm text-zinc-500 dark:text-zinc-400 list-none p-0">
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>Bulk email sequences or marketing automation</span></li>
+                  <li class="flex items-start gap-2"><i data-lucide="minus" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i><span>SMS reminders</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-5 rounded-md border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-sm text-emerald-900 dark:text-emerald-200">
+              <p class="flex items-start gap-2"><i data-lucide="flag" class="w-4 h-4 mt-0.5 shrink-0"></i><span><span class="font-semibold">Done when:</span> Every contact shows its activity history, the dashboard shows live pipeline/task/lead stats, and you can send a one-off email to any contact.</span></p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <footer class="pt-8 border-t border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 dark:text-zinc-400">
+      Generated by <span class="font-medium">bm-prd-creator</span>. Open the milestone-1 <code class="font-mono">prompt.md</code> to start building.
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var html = document.documentElement;
+      var stored = localStorage.getItem('prd-theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var initial = stored ? stored : (prefersDark ? 'dark' : 'light');
+      if (initial === 'dark') html.classList.add('dark');
+      var btn = document.getElementById('theme-toggle');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          var isDark = html.classList.toggle('dark');
+          localStorage.setItem('prd-theme', isDark ? 'dark' : 'light');
+        });
+      }
+      if (window.lucide) window.lucide.createIcons();
+    })();
+  </script>
+</body>
+</html>
