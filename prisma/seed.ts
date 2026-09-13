@@ -25,6 +25,26 @@ async function main() {
   });
 
   console.log(`Seeded admin user: ${user.email}`);
+
+  const DEFAULT_STAGES = [
+    "New Lead",
+    "Contacted",
+    "Call Booked",
+    "Call Completed",
+    "Proposal Sent",
+    "Won",
+    "Lost",
+  ];
+
+  const stageCount = await prisma.stage.count();
+  if (stageCount === 0) {
+    await prisma.stage.createMany({
+      data: DEFAULT_STAGES.map((name, position) => ({ name, position })),
+    });
+    console.log(`Seeded ${DEFAULT_STAGES.length} default pipeline stages`);
+  } else {
+    console.log(`Skipped stage seeding — ${stageCount} stage(s) already exist`);
+  }
 }
 
 main()

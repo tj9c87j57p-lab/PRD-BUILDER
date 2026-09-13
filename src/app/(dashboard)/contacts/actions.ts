@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export interface ContactFormState {
@@ -81,7 +82,17 @@ export async function deleteContact(formData: FormData) {
     return;
   }
 
-  await prisma.contact.delete({ where: { id } });
+  try {
+    await prisma.contact.delete({ where: { id } });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2003"
+    ) {
+      redirect(`/contacts/${id}?deleteError=1`);
+    }
+    throw error;
+  }
 
   redirect("/contacts");
 }

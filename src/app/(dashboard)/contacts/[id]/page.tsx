@@ -13,12 +13,18 @@ function formatDate(date: Date | null): string {
 
 export default async function ContactDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ deleteError?: string }>;
 }) {
   const { id } = await params;
+  const { deleteError } = await searchParams;
 
-  const contact = await prisma.contact.findUnique({ where: { id } });
+  const contact = await prisma.contact.findUnique({
+    where: { id },
+    include: { _count: { select: { deals: true } } },
+  });
 
   if (!contact) {
     notFound();
@@ -26,6 +32,14 @@ export default async function ContactDetailPage({
 
   return (
     <div className="max-w-2xl">
+      {deleteError ? (
+        <div className="mb-4 rounded-md border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-200">
+          Cannot delete — {contact._count.deals} deal
+          {contact._count.deals === 1 ? "" : "s"} still linked to this
+          contact. Delete or reassign those deals first.
+        </div>
+      ) : null}
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {contact.name}
