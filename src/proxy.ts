@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getIronSession, nextProxyCookies } from "iron-session";
 import { sessionOptions, type SessionData } from "@/lib/session";
 
-const PUBLIC_PATHS = new Set(["/", "/login", "/book"]);
+const PUBLIC_PATHS = new Set(["/", "/login", "/book", "/api/reminders"]);
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.has(pathname) || pathname.startsWith("/uploads/");

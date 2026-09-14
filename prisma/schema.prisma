@@ -30,6 +30,7 @@ model Contact {
   deals           Deal[]
   tasks           Task[]
   submissions     LeadMagnetSubmission[]
+  bookings        Booking[]
 }
 
 model Stage {
@@ -54,6 +55,7 @@ model Deal {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   tasks             Task[]
+  bookings          Booking[]
 
   @@index([contactId])
   @@index([stageId])
@@ -98,4 +100,46 @@ model LeadMagnetSubmission {
 
   @@index([leadMagnetId])
   @@index([contactId])
+}
+
+model AvailabilityWindow {
+  id        String   @id @default(cuid())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dayOfWeek])
+}
+
+model BlockedDate {
+  id        String   @id @default(cuid())
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startDate, endDate])
+}
+
+model Booking {
+  id                    String    @id @default(cuid())
+  contactId             String
+  contact               Contact   @relation(fields: [contactId], references: [id], onDelete: Restrict)
+  dealId                String?
+  deal                  Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  startAt               DateTime
+  endAt                 DateTime
+  cancelledAt           DateTime?
+  googleCalendarEventId String?
+  confirmationSentAt    DateTime?
+  reminderSentAt        DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([contactId])
+  @@index([dealId])
+  @@index([startAt, endAt])
 }
