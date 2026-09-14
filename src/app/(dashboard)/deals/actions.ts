@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { dollarsToCents } from "@/lib/money";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 
 export interface DealFormState {
   error?: string;
@@ -61,6 +62,13 @@ export async function createDeal(
     data: { contactId, stageId, valueCents, expectedCloseDate, notes },
   });
 
+  const stage = await prisma.stage.findUnique({ where: { id: stageId } });
+  await logActivity(
+    contactId,
+    ACTIVITY_TYPES.DEAL_CREATED,
+    `Deal created${stage ? ` in ${stage.name}` : ""}`
+  );
+
   redirect(`/deals/${deal.id}`);
 }
 
@@ -90,6 +98,8 @@ export async function updateDeal(
     return { error: "Deal not found." };
   }
 
+  const stageChanged = existing.stageId !== stageId;
+
   await prisma.deal.update({
     where: { id },
     data: {
@@ -98,10 +108,20 @@ export async function updateDeal(
       valueCents,
       expectedCloseDate,
       notes,
-      stageEnteredAt:
-        existing.stageId !== stageId ? new Date() : existing.stageEnteredAt,
+      stageEnteredAt: stageChanged ? new Date() : existing.stageEnteredAt,
     },
   });
+
+  if (stageChanged) {
+    const stage = await prisma.stage.findUnique({ where: { id: stageId } });
+    if (stage) {
+      await logActivity(
+        contactId,
+        ACTIVITY_TYPES.DEAL_STAGE_CHANGED,
+        `Moved to ${stage.name}`
+      );
+    }
+  }
 
   redirect(`/deals/${id}`);
 }
@@ -139,6 +159,15 @@ export async function moveDeal(
       where: { id: dealId },
       data: { stageId: newStageId, stageEnteredAt: new Date() },
     });
+
+    const stage = await prisma.stage.findUnique({ where: { id: newStageId } });
+    if (stage) {
+      await logActivity(
+        deal.contactId,
+        ACTIVITY_TYPES.DEAL_STAGE_CHANGED,
+        `Moved to ${stage.name}`
+      );
+    }
 
     revalidatePath("/deals");
     return {};

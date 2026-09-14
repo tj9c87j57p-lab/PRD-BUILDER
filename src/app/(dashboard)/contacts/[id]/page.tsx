@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DeleteContactButton } from "@/components/DeleteContactButton";
 import { TaskList } from "@/components/TaskList";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { SendEmailForm } from "@/components/SendEmailForm";
 
 const rowClasses = "flex gap-2 py-2";
 const labelClasses = "w-36 shrink-0 text-xs font-medium uppercase tracking-wide text-muted";
@@ -31,11 +33,17 @@ export default async function ContactDetailPage({
     notFound();
   }
 
-  const tasks = await prisma.task.findMany({
-    where: { contactId: id, completedAt: null },
-    orderBy: { dueAt: "asc" },
-    include: { contact: true, deal: { include: { contact: true } } },
-  });
+  const [tasks, activityEntries] = await Promise.all([
+    prisma.task.findMany({
+      where: { contactId: id, completedAt: null },
+      orderBy: { dueAt: "asc" },
+      include: { contact: true, deal: { include: { contact: true } } },
+    }),
+    prisma.activityLogEntry.findMany({
+      where: { contactId: id },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
   return (
     <div className="max-w-2xl">
@@ -133,6 +141,24 @@ export default async function ContactDetailPage({
         </div>
         <div className="mt-3">
           <TaskList tasks={tasks} />
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Send Email
+        </h2>
+        <div className="mt-3">
+          <SendEmailForm contactId={contact.id} hasEmail={Boolean(contact.email)} />
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          Activity
+        </h2>
+        <div className="mt-3">
+          <ActivityTimeline entries={activityEntries} />
         </div>
       </div>
 

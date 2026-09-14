@@ -31,6 +31,7 @@ model Contact {
   tasks           Task[]
   submissions     LeadMagnetSubmission[]
   bookings        Booking[]
+  activityLog     ActivityLogEntry[]
 }
 
 model Stage {
@@ -142,4 +143,15 @@ model Booking {
   @@index([contactId])
   @@index([dealId])
   @@index([startAt, endAt])
+}
+
+model ActivityLogEntry {
+  id          String   @id @default(cuid())
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([contactId, createdAt])
 }

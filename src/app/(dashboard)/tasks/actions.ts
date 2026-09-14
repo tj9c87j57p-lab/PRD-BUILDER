@@ -4,6 +4,20 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { parseDateTimeInput } from "@/lib/dates";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
+
+async function resolveContactId(
+  contactId: string | null,
+  dealId: string | null
+): Promise<string | null> {
+  if (contactId) return contactId;
+  if (!dealId) return null;
+  const deal = await prisma.deal.findUnique({
+    where: { id: dealId },
+    select: { contactId: true },
+  });
+  return deal?.contactId ?? null;
+}
 
 export interface TaskFormState {
   error?: string;
@@ -40,6 +54,15 @@ export async function createTask(
     data: { description, dueAt, contactId, dealId },
   });
 
+  const targetContactId = await resolveContactId(contactId, dealId);
+  if (targetContactId) {
+    await logActivity(
+      targetContactId,
+      ACTIVITY_TYPES.TASK_CREATED,
+      `Task created: ${description}`
+    );
+  }
+
   if (contactId) {
     redirect(`/contacts/${contactId}`);
   }
@@ -75,11 +98,23 @@ export async function updateTask(
   const completedAt = completed
     ? (existing.completedAt ?? new Date())
     : null;
+  const justCompleted = completed && !existing.completedAt;
 
   await prisma.task.update({
     where: { id },
     data: { description, dueAt, contactId, dealId, completedAt },
   });
+
+  if (justCompleted) {
+    const targetContactId = await resolveContactId(contactId, dealId);
+    if (targetContactId) {
+      await logActivity(
+        targetContactId,
+        ACTIVITY_TYPES.TASK_COMPLETED,
+        `Completed: ${description}`
+      );
+    }
+  }
 
   redirect("/tasks");
 }
@@ -107,8 +142,17 @@ export async function completeTask(
     const task = await prisma.task.update({
       where: { id: taskId },
       data: { completedAt: new Date() },
-      select: { contactId: true, dealId: true },
+      select: { contactId: true, dealId: true, description: true },
     });
+
+    const targetContactId = await resolveContactId(task.contactId, task.dealId);
+    if (targetContactId) {
+      await logActivity(
+        targetContactId,
+        ACTIVITY_TYPES.TASK_COMPLETED,
+        `Completed: ${task.description}`
+      );
+    }
 
     revalidatePath("/tasks");
     if (task.contactId) {

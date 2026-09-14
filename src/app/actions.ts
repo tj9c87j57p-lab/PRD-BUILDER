@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 
 export interface SubmitLeadMagnetState {
   error?: string;
@@ -59,11 +60,17 @@ export async function submitLeadMagnet(
       },
     });
     contactId = created.id;
+    await logActivity(contactId, ACTIVITY_TYPES.CONTACT_CREATED, "Contact added");
   }
 
   await prisma.leadMagnetSubmission.create({
     data: { leadMagnetId, contactId },
   });
+  await logActivity(
+    contactId,
+    ACTIVITY_TYPES.LEAD_MAGNET_DOWNLOADED,
+    `Downloaded ${leadMagnet.title}`
+  );
 
   return { downloadUrl: leadMagnet.fileUrl };
 }

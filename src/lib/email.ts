@@ -8,6 +8,7 @@ export async function sendEmail(input: {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }): Promise<void> {
   if (!resend) {
     console.log("[email] RESEND_API_KEY not set, skipping send:", input);
@@ -19,6 +20,7 @@ export async function sendEmail(input: {
     to: input.to,
     subject: input.subject,
     html: input.html,
+    replyTo: input.replyTo,
   });
 
   if (error) {

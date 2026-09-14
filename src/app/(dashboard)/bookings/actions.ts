@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 
 const DAY_NAMES = [
   "Sunday",
@@ -100,12 +101,20 @@ export async function cancelBooking(id: string): Promise<{ error?: string }> {
     return { error: "Missing booking id." };
   }
 
-  await prisma.booking.update({
+  const booking = await prisma.booking.update({
     where: { id },
     data: { cancelledAt: new Date() },
+    select: { contactId: true, startAt: true },
   });
+
+  await logActivity(
+    booking.contactId,
+    ACTIVITY_TYPES.BOOKING_CANCELLED,
+    `Cancelled call scheduled for ${booking.startAt.toLocaleString()}`
+  );
 
   revalidatePath("/bookings");
   revalidatePath("/book");
+  revalidatePath(`/contacts/${booking.contactId}`);
   return {};
 }

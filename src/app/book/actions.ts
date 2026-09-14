@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { SLOT_MINUTES, hasOverlappingBooking } from "@/lib/booking";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { sendEmail } from "@/lib/email";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 
 export interface CreateBookingState {
   error?: string;
@@ -60,6 +61,7 @@ export async function createBooking(
       },
     });
     contactId = created.id;
+    await logActivity(contactId, ACTIVITY_TYPES.CONTACT_CREATED, "Contact added");
   }
 
   let dealId: string | null = null;
@@ -92,6 +94,11 @@ export async function createBooking(
       return tx.booking.create({ data: { contactId, dealId, startAt, endAt } });
     });
     bookingId = booking.id;
+    await logActivity(
+      contactId,
+      ACTIVITY_TYPES.BOOKING_CREATED,
+      `Booked a call for ${startAt.toLocaleString()}`
+    );
   } catch (error) {
     if (error instanceof Error && error.message === "SLOT_TAKEN") {
       return {

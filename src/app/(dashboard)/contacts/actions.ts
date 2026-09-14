@@ -1,8 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
+import { sendEmail } from "@/lib/email";
 
 export interface ContactFormState {
   error?: string;
@@ -51,6 +54,7 @@ export async function createContact(
   }
 
   const contact = await prisma.contact.create({ data });
+  await logActivity(contact.id, ACTIVITY_TYPES.CONTACT_CREATED, "Contact added");
 
   redirect(`/contacts/${contact.id}`);
 }
@@ -70,7 +74,16 @@ export async function updateContact(
     return { error: "Name is required." };
   }
 
+  const existing = await prisma.contact.findUnique({ where: { id } });
+  if (!existing) {
+    return { error: "Contact not found." };
+  }
+
   await prisma.contact.update({ where: { id }, data });
+
+  if (data.notes !== existing.notes) {
+    await logActivity(id, ACTIVITY_TYPES.NOTE_UPDATED, "Notes updated");
+  }
 
   redirect(`/contacts/${id}`);
 }
@@ -95,4 +108,60 @@ export async function deleteContact(formData: FormData) {
   }
 
   redirect("/contacts");
+}
+
+export interface SendEmailFormState {
+  error?: string;
+  success?: boolean;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+export async function sendContactEmail(
+  _prevState: SendEmailFormState | undefined,
+  formData: FormData
+): Promise<SendEmailFormState> {
+  const contactId = String(formData.get("contactId") ?? "");
+  const subject = String(formData.get("subject") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (!contactId) {
+    return { error: "Missing contact id." };
+  }
+  if (!subject) {
+    return { error: "Enter a subject." };
+  }
+  if (!body) {
+    return { error: "Enter a message." };
+  }
+
+  const contact = await prisma.contact.findUnique({ where: { id: contactId } });
+  if (!contact) {
+    return { error: "Contact not found." };
+  }
+  if (!contact.email) {
+    return { error: "This contact has no email address on file." };
+  }
+
+  const html = escapeHtml(body)
+    .split("\n")
+    .map((line) => `<p>${line || "&nbsp;"}</p>`)
+    .join("");
+
+  await sendEmail({
+    to: contact.email,
+    subject,
+    html,
+    replyTo: process.env.ADMIN_EMAIL,
+  });
+
+  await logActivity(contactId, ACTIVITY_TYPES.EMAIL_SENT, `Sent email: ${subject}`);
+
+  revalidatePath(`/contacts/${contactId}`);
+  return { success: true };
 }

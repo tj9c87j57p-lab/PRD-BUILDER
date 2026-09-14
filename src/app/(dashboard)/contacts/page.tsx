@@ -5,9 +5,14 @@ import { prisma } from "@/lib/prisma";
 export default async function ContactsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; tag?: string; source?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    tag?: string;
+    source?: string;
+    booked?: string;
+  }>;
 }) {
-  const { q, tag, source } = await searchParams;
+  const { q, tag, source, booked } = await searchParams;
 
   const where: Prisma.ContactWhereInput = {};
 
@@ -23,6 +28,11 @@ export default async function ContactsPage({
   }
   if (source) {
     where.source = source;
+  }
+  if (booked === "no") {
+    where.bookings = { none: {} };
+  } else if (booked === "yes") {
+    where.bookings = { some: {} };
   }
 
   const [contacts, tagRows, sourceGroups] = await Promise.all([
@@ -112,13 +122,31 @@ export default async function ContactsPage({
             ))}
           </select>
         </div>
+        <div>
+          <label
+            htmlFor="booked"
+            className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted"
+          >
+            Booking status
+          </label>
+          <select
+            id="booked"
+            name="booked"
+            defaultValue={booked ?? ""}
+            className="w-44 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+          >
+            <option value="">Any booking status</option>
+            <option value="yes">Has booked a call</option>
+            <option value="no">Never booked</option>
+          </select>
+        </div>
         <button
           type="submit"
           className="rounded-md border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-accent"
         >
           Filter
         </button>
-        {q || tag || source ? (
+        {q || tag || source || booked ? (
           <Link
             href="/contacts"
             className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
