@@ -3,7 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
-  const secret = request.nextUrl.searchParams.get("secret");
+  // Vercel Cron automatically sends `Authorization: Bearer <CRON_SECRET>`
+  // when invoking scheduled routes — accept that, or a `?secret=` query
+  // param for manual testing / an external cron service.
+  const authHeader = request.headers.get("authorization");
+  const bearerSecret = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length)
+    : null;
+  const secret = bearerSecret ?? request.nextUrl.searchParams.get("secret");
+
   if (!secret || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
