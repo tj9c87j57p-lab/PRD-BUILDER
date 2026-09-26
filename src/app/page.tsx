@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { LeadMagnetCard } from "@/components/LeadMagnetCard";
+import { TestimonialCard } from "@/components/TestimonialCard";
 
 const PAID_OFFERS = [
   { title: "Online Coaching", url: process.env.PAID_OFFER_ONLINE_COACHING_URL },
@@ -12,6 +13,11 @@ const PAID_OFFERS = [
 
 export default async function HomePage() {
   const leadMagnets = await prisma.leadMagnet.findMany({
+    where: { active: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const testimonials = await prisma.testimonial.findMany({
     where: { active: true },
     orderBy: { createdAt: "desc" },
   });
@@ -56,6 +62,19 @@ export default async function HomePage() {
               >
                 {offer.title}
               </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {testimonials.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">
+            Client transformations
+          </h2>
+          <div className="mt-4 flex flex-col gap-4">
+            {testimonials.map((t) => (
+              <TestimonialCard key={t.id} testimonial={t} />
             ))}
           </div>
         </section>

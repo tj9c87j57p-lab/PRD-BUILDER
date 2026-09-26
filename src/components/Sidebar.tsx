@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/tasks", label: "Tasks" },
   { href: "/bookings", label: "Bookings" },
   { href: "/leads", label: "Leads" },
+  { href: "/testimonials", label: "Testimonials" },
 ] as const;
 
 export function Sidebar({ userName }: { userName: string }) {

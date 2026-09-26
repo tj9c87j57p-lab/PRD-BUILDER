@@ -155,3 +155,14 @@ model ActivityLogEntry {
 
   @@index([contactId, createdAt])
 }
+
+model Testimonial {
+  id             String   @id @default(cuid())
+  clientName     String
+  quote          String
+  beforePhotoUrl String?
+  afterPhotoUrl  String?
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

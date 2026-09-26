@@ -32,10 +32,10 @@ export async function createLeadMagnet(
     return { error: "The lead magnet file must be a PDF." };
   }
 
-  const fileUrl = await saveUploadedFile(pdfFile, "pdf");
+  const fileUrl = await saveUploadedFile(pdfFile, "lead-magnets/pdf");
   const coverImageUrl =
     coverImageFile && coverImageFile.size > 0
-      ? await saveUploadedFile(coverImageFile, "cover")
+      ? await saveUploadedFile(coverImageFile, "lead-magnets/cover")
       : null;
 
   await prisma.leadMagnet.create({
@@ -77,12 +77,12 @@ export async function updateLeadMagnet(
     if (pdfFile.type !== "application/pdf") {
       return { error: "The lead magnet file must be a PDF." };
     }
-    fileUrl = await saveUploadedFile(pdfFile, "pdf");
+    fileUrl = await saveUploadedFile(pdfFile, "lead-magnets/pdf");
   }
 
   let coverImageUrl = existing.coverImageUrl;
   if (coverImageFile && coverImageFile.size > 0) {
-    coverImageUrl = await saveUploadedFile(coverImageFile, "cover");
+    coverImageUrl = await saveUploadedFile(coverImageFile, "lead-magnets/cover");
   }
 
   await prisma.leadMagnet.update({

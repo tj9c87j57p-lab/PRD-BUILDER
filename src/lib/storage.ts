@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "lead-magnets");
+const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
 
 const r2AccountId = process.env.R2_ACCOUNT_ID;
 const r2AccessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -28,13 +28,13 @@ function sanitizeFilename(name: string): string {
 
 export async function saveUploadedFile(
   file: File,
-  subfolder: string
+  folder: string
 ): Promise<string> {
   const filename = `${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;
   const bytes = Buffer.from(await file.arrayBuffer());
 
   if (r2Client && r2BucketName && r2PublicUrl) {
-    const key = `lead-magnets/${subfolder}/${filename}`;
+    const key = `${folder}/${filename}`;
     await r2Client.send(
       new PutObjectCommand({
         Bucket: r2BucketName,
@@ -49,8 +49,8 @@ export async function saveUploadedFile(
   console.log(
     "[storage] Cloudflare R2 not configured — writing to local disk (dev only, not durable in a real deploy)"
   );
-  const dir = path.join(UPLOAD_ROOT, subfolder);
+  const dir = path.join(UPLOAD_ROOT, folder);
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, filename), bytes);
-  return `/uploads/lead-magnets/${subfolder}/${filename}`;
+  return `/uploads/${folder}/${filename}`;
 }
