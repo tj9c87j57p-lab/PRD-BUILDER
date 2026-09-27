@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { LeadMagnetCard } from "@/components/LeadMagnetCard";
@@ -25,9 +26,14 @@ export default async function HomePage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-md px-4 py-10">
       <header className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Precision Coach
-        </h1>
+        <Image
+          src="/logo.jpg"
+          alt="Precision Coach"
+          width={600}
+          height={537}
+          priority
+          className="mx-auto h-20 w-auto"
+        />
         <p className="mt-2 text-sm text-muted">
           Online &amp; in-person health and fitness coaching.
         </p>
