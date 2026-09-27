@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/(dashboard)/actions";
@@ -46,7 +45,8 @@ export function Sidebar({ userName }: { userName: string }) {
   return (
     <>
       <div className="flex items-center justify-between border-b border-border px-4 py-3 md:hidden">
-        <Image src="/logo.jpg" alt="Precision Coach" width={600} height={537} className="h-8 w-auto" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.jpg" alt="Precision Coach" className="h-8 w-auto" />
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -65,11 +65,10 @@ export function Sidebar({ userName }: { userName: string }) {
       ) : null}
 
       <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-background px-4 py-6 md:flex">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo.jpg"
           alt="Precision Coach"
-          width={600}
-          height={537}
           className="mb-6 h-10 w-auto px-1"
         />
         {nav}
