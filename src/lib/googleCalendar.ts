@@ -12,13 +12,18 @@ function getCalendarClient() {
   return google.calendar({ version: "v3", auth });
 }
 
+export interface CreatedCalendarEvent {
+  eventId: string | null;
+  meetLink: string | null;
+}
+
 export async function createCalendarEvent(input: {
   summary: string;
   description?: string;
   startAt: Date;
   endAt: Date;
   attendeeEmail?: string;
-}): Promise<string | null> {
+}): Promise<CreatedCalendarEvent | null> {
   const calendar = getCalendarClient();
   if (!calendar) {
     console.log("[googleCalendar] not configured, skipping event push", input);
@@ -27,14 +32,24 @@ export async function createCalendarEvent(input: {
 
   const res = await calendar.events.insert({
     calendarId: "primary",
+    conferenceDataVersion: 1,
     requestBody: {
       summary: input.summary,
       description: input.description,
       start: { dateTime: input.startAt.toISOString() },
       end: { dateTime: input.endAt.toISOString() },
       attendees: input.attendeeEmail ? [{ email: input.attendeeEmail }] : undefined,
+      conferenceData: {
+        createRequest: {
+          requestId: crypto.randomUUID(),
+          conferenceSolutionKey: { type: "hangoutsMeet" },
+        },
+      },
     },
   });
 
-  return res.data.id ?? null;
+  return {
+    eventId: res.data.id ?? null,
+    meetLink: res.data.hangoutLink ?? null,
+  };
 }

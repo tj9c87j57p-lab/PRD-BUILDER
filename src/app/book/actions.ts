@@ -9,6 +9,7 @@ import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 export interface CreateBookingState {
   error?: string;
   success?: boolean;
+  meetLink?: string;
 }
 
 export async function createBooking(
@@ -108,18 +109,23 @@ export async function createBooking(
     throw error;
   }
 
+  let meetLink: string | null = null;
   try {
-    const eventId = await createCalendarEvent({
+    const event = await createCalendarEvent({
       summary: `Call with ${name}`,
       description: `Booked via the website. Contact: ${email}${phone ? `, ${phone}` : ""}`,
       startAt,
       endAt,
       attendeeEmail: email,
     });
-    if (eventId) {
+    if (event?.eventId) {
+      meetLink = event.meetLink;
       await prisma.booking.update({
         where: { id: bookingId },
-        data: { googleCalendarEventId: eventId },
+        data: {
+          googleCalendarEventId: event.eventId,
+          googleMeetLink: event.meetLink,
+        },
       });
     }
   } catch (error) {
@@ -130,7 +136,11 @@ export async function createBooking(
     await sendEmail({
       to: email,
       subject: "Your call is booked",
-      html: `<p>Hi ${name},</p><p>Your call is confirmed for ${startAt.toLocaleString()}.</p>`,
+      html: `<p>Hi ${name},</p><p>Your call is confirmed for ${startAt.toLocaleString()}.</p>${
+        meetLink
+          ? `<p>Join by Google Meet: <a href="${meetLink}">${meetLink}</a></p>`
+          : ""
+      }`,
     });
     await prisma.booking.update({
       where: { id: bookingId },
@@ -140,5 +150,5 @@ export async function createBooking(
     console.error("[booking] confirmation email failed:", error);
   }
 
-  return { success: true };
+  return { success: true, meetLink: meetLink ?? undefined };
 }

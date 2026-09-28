@@ -135,6 +135,7 @@ model Booking {
   endAt                 DateTime
   cancelledAt           DateTime?
   googleCalendarEventId String?
+  googleMeetLink        String?
   confirmationSentAt    DateTime?
   reminderSentAt        DateTime?
   createdAt             DateTime  @default(now())

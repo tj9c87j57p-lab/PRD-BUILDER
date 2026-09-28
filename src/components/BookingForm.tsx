@@ -27,6 +27,16 @@ export function BookingForm({
         <p className="mt-2 text-sm text-muted">
           Check your email for a confirmation.
         </p>
+        {state.meetLink ? (
+          <a
+            href={state.meetLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+          >
+            Join by Google Meet
+          </a>
+        ) : null}
       </div>
     );
   }
