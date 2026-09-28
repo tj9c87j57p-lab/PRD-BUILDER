@@ -103,30 +103,50 @@ model LeadMagnetSubmission {
   @@index([contactId])
 }
 
+model Coach {
+  id                  String   @id @default(cuid())
+  name                String
+  email               String   @unique
+  googleRefreshToken  String?
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  availabilityWindows AvailabilityWindow[]
+  blockedDates        BlockedDate[]
+  bookings            Booking[]
+}
+
 model AvailabilityWindow {
   id        String   @id @default(cuid())
+  coachId   String
+  coach     Coach    @relation(fields: [coachId], references: [id], onDelete: Cascade)
   dayOfWeek Int
   startTime String
   endTime   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([dayOfWeek])
+  @@index([coachId, dayOfWeek])
 }
 
 model BlockedDate {
   id        String   @id @default(cuid())
+  coachId   String
+  coach     Coach    @relation(fields: [coachId], references: [id], onDelete: Cascade)
   startDate DateTime
   endDate   DateTime
   reason    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([startDate, endDate])
+  @@index([coachId, startDate, endDate])
 }
 
 model Booking {
   id                    String    @id @default(cuid())
+  coachId               String
+  coach                 Coach     @relation(fields: [coachId], references: [id], onDelete: Restrict)
   contactId             String
   contact               Contact   @relation(fields: [contactId], references: [id], onDelete: Restrict)
   dealId                String?
@@ -141,6 +161,7 @@ model Booking {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@index([coachId])
   @@index([contactId])
   @@index([dealId])
   @@index([startAt, endAt])

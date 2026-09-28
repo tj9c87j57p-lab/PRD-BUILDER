@@ -1,9 +1,13 @@
 import { google } from "googleapis";
 
-function getCalendarClient() {
+function getCalendarClient(coachRefreshToken?: string | null) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+  // Coaches share one registered OAuth app (client id/secret) but each
+  // authorizes their own calendar, producing their own refresh token.
+  // Falling back to the env var keeps the original coach working without
+  // re-authorizing after this became per-coach.
+  const refreshToken = coachRefreshToken || process.env.GOOGLE_REFRESH_TOKEN;
   if (!clientId || !clientSecret || !refreshToken) return null;
 
   const auth = new google.auth.OAuth2(clientId, clientSecret);
@@ -23,8 +27,9 @@ export async function createCalendarEvent(input: {
   startAt: Date;
   endAt: Date;
   attendeeEmail?: string;
+  coachRefreshToken?: string | null;
 }): Promise<CreatedCalendarEvent | null> {
-  const calendar = getCalendarClient();
+  const calendar = getCalendarClient(input.coachRefreshToken);
   if (!calendar) {
     console.log("[googleCalendar] not configured, skipping event push", input);
     return null;

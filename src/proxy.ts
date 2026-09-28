@@ -5,7 +5,12 @@ import { sessionOptions, type SessionData } from "@/lib/session";
 const PUBLIC_PATHS = new Set(["/", "/login", "/book", "/api/reminders", "/logo.jpg"]);
 
 function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.has(pathname) || pathname.startsWith("/uploads/");
+  return (
+    PUBLIC_PATHS.has(pathname) ||
+    pathname.startsWith("/uploads/") ||
+    // /book/[coachId] — careful not to match /bookings (the admin route)
+    pathname.startsWith("/book/")
+  );
 }
 
 export async function proxy(request: NextRequest) {

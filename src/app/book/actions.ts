@@ -16,11 +16,15 @@ export async function createBooking(
   _prevState: CreateBookingState | undefined,
   formData: FormData
 ): Promise<CreateBookingState> {
+  const coachId = String(formData.get("coachId") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const slotRaw = String(formData.get("slot") ?? "").trim();
 
+  if (!coachId) {
+    return { error: "Missing coach." };
+  }
   if (!name) {
     return { error: "Enter your name." };
   }
@@ -29,6 +33,11 @@ export async function createBooking(
   }
   if (!slotRaw) {
     return { error: "Choose a time." };
+  }
+
+  const coach = await prisma.coach.findUnique({ where: { id: coachId } });
+  if (!coach || !coach.active) {
+    return { error: "That coach isn't available for booking right now." };
   }
 
   const startAt = new Date(slotRaw);
@@ -88,11 +97,13 @@ export async function createBooking(
   let bookingId: string;
   try {
     const booking = await prisma.$transaction(async (tx) => {
-      const conflict = await hasOverlappingBooking(tx, startAt, endAt);
+      const conflict = await hasOverlappingBooking(tx, coachId, startAt, endAt);
       if (conflict) {
         throw new Error("SLOT_TAKEN");
       }
-      return tx.booking.create({ data: { contactId, dealId, startAt, endAt } });
+      return tx.booking.create({
+        data: { coachId, contactId, dealId, startAt, endAt },
+      });
     });
     bookingId = booking.id;
     await logActivity(
@@ -117,6 +128,7 @@ export async function createBooking(
       startAt,
       endAt,
       attendeeEmail: email,
+      coachRefreshToken: coach.googleRefreshToken,
     });
     if (event?.eventId) {
       meetLink = event.meetLink;
@@ -136,11 +148,12 @@ export async function createBooking(
     await sendEmail({
       to: email,
       subject: "Your call is booked",
-      html: `<p>Hi ${name},</p><p>Your call is confirmed for ${startAt.toLocaleString()}.</p>${
+      html: `<p>Hi ${name},</p><p>Your call with ${coach.name} is confirmed for ${startAt.toLocaleString()}.</p>${
         meetLink
           ? `<p>Join by Google Meet: <a href="${meetLink}">${meetLink}</a></p>`
           : ""
       }`,
+      replyTo: coach.email,
     });
     await prisma.booking.update({
       where: { id: bookingId },

@@ -18,7 +18,7 @@ function parseTimeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
-export async function getAvailableSlots(): Promise<AvailableSlot[]> {
+export async function getAvailableSlots(coachId: string): Promise<AvailableSlot[]> {
   const now = new Date();
   const windowStart = now;
   const windowEnd = dateOnlyFromYMD(
@@ -28,10 +28,15 @@ export async function getAvailableSlots(): Promise<AvailableSlot[]> {
   );
 
   const [windows, blockedDates, bookings] = await Promise.all([
-    prisma.availabilityWindow.findMany(),
-    prisma.blockedDate.findMany(),
+    prisma.availabilityWindow.findMany({ where: { coachId } }),
+    prisma.blockedDate.findMany({ where: { coachId } }),
     prisma.booking.findMany({
-      where: { cancelledAt: null, startAt: { lt: windowEnd }, endAt: { gt: windowStart } },
+      where: {
+        coachId,
+        cancelledAt: null,
+        startAt: { lt: windowEnd },
+        endAt: { gt: windowStart },
+      },
     }),
   ]);
 
@@ -93,11 +98,12 @@ export async function getAvailableSlots(): Promise<AvailableSlot[]> {
 
 export async function hasOverlappingBooking(
   client: Prisma.TransactionClient,
+  coachId: string,
   startAt: Date,
   endAt: Date
 ): Promise<boolean> {
   const conflict = await client.booking.findFirst({
-    where: { cancelledAt: null, startAt: { lt: endAt }, endAt: { gt: startAt } },
+    where: { coachId, cancelledAt: null, startAt: { lt: endAt }, endAt: { gt: startAt } },
   });
   return Boolean(conflict);
 }

@@ -13,7 +13,7 @@ const fieldClasses =
 const labelClasses =
   "mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted";
 
-export function BlockedDateForm() {
+export function BlockedDateForm({ coachId }: { coachId: string }) {
   const [state, formAction, pending] = useActionState(
     createBlockedDate,
     initialState
@@ -24,6 +24,7 @@ export function BlockedDateForm() {
       action={formAction}
       className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
     >
+      <input type="hidden" name="coachId" value={coachId} />
       <div>
         <label htmlFor="startDate" className={labelClasses}>
           Start date

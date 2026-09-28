@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AvailabilityForm } from "@/components/AvailabilityForm";
 import { BlockedDateForm } from "@/components/BlockedDateForm";
@@ -23,12 +25,36 @@ function formatBookingTime(date: Date): string {
   });
 }
 
-export default async function BookingsPage() {
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ coach?: string }>;
+}) {
+  const { coach: coachParam } = await searchParams;
+
+  const coaches = await prisma.coach.findMany({ orderBy: { createdAt: "asc" } });
+  const selectedCoach =
+    coaches.find((c) => c.id === coachParam) ?? coaches[0] ?? null;
+
+  if (!selectedCoach) {
+    notFound();
+  }
+
   const [windows, blockedDates, upcomingBookings] = await Promise.all([
-    prisma.availabilityWindow.findMany({ orderBy: { dayOfWeek: "asc" } }),
-    prisma.blockedDate.findMany({ orderBy: { startDate: "asc" } }),
+    prisma.availabilityWindow.findMany({
+      where: { coachId: selectedCoach.id },
+      orderBy: { dayOfWeek: "asc" },
+    }),
+    prisma.blockedDate.findMany({
+      where: { coachId: selectedCoach.id },
+      orderBy: { startDate: "asc" },
+    }),
     prisma.booking.findMany({
-      where: { cancelledAt: null, startAt: { gte: new Date() } },
+      where: {
+        coachId: selectedCoach.id,
+        cancelledAt: null,
+        startAt: { gte: new Date() },
+      },
       orderBy: { startAt: "asc" },
       include: { contact: true },
     }),
@@ -41,22 +67,41 @@ export default async function BookingsPage() {
           Bookings
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Manage your call availability and see who&apos;s booked.
+          Manage call availability and see who&apos;s booked, per coach.
         </p>
       </div>
 
-      <AvailabilityForm windows={windows} />
+      {coaches.length > 1 ? (
+        <div className="flex flex-wrap gap-2">
+          {coaches.map((c) => (
+            <Link
+              key={c.id}
+              href={`/bookings?coach=${c.id}`}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                c.id === selectedCoach.id
+                  ? "bg-accent text-accent-foreground"
+                  : "border border-border text-muted hover:text-foreground"
+              }`}
+            >
+              {c.name}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
+      <AvailabilityForm coachId={selectedCoach.id} windows={windows} />
 
       <section className="w-full rounded-lg border border-border bg-surface p-6">
         <h2 className="text-lg font-semibold tracking-tight text-foreground">
           Blocked dates
         </h2>
         <p className="mt-1 text-xs text-muted">
-          Vacation or one-off days you&apos;re unavailable, even during your usual hours.
+          Vacation or one-off days {selectedCoach.name} is unavailable, even
+          during their usual hours.
         </p>
 
         <div className="mt-4">
-          <BlockedDateForm />
+          <BlockedDateForm coachId={selectedCoach.id} />
         </div>
 
         <div className="mt-4 flex flex-col gap-2">

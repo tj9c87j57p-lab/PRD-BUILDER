@@ -22,7 +22,13 @@ export async function setAvailabilityWindows(
   _prevState: AvailabilityFormState | undefined,
   formData: FormData
 ): Promise<AvailabilityFormState> {
-  const windows: { dayOfWeek: number; startTime: string; endTime: string }[] = [];
+  const coachId = String(formData.get("coachId") ?? "").trim();
+  if (!coachId) {
+    return { error: "Missing coach id." };
+  }
+
+  const windows: { coachId: string; dayOfWeek: number; startTime: string; endTime: string }[] =
+    [];
 
   for (let day = 0; day < 7; day++) {
     const enabled = formData.get(`day-${day}-enabled`) === "on";
@@ -38,11 +44,11 @@ export async function setAvailabilityWindows(
       return { error: `${DAY_NAMES[day]}'s start time must be before its end time.` };
     }
 
-    windows.push({ dayOfWeek: day, startTime, endTime });
+    windows.push({ coachId, dayOfWeek: day, startTime, endTime });
   }
 
   await prisma.$transaction([
-    prisma.availabilityWindow.deleteMany(),
+    prisma.availabilityWindow.deleteMany({ where: { coachId } }),
     prisma.availabilityWindow.createMany({ data: windows }),
   ]);
 
@@ -59,10 +65,14 @@ export async function createBlockedDate(
   _prevState: BlockedDateFormState | undefined,
   formData: FormData
 ): Promise<BlockedDateFormState> {
+  const coachId = String(formData.get("coachId") ?? "").trim();
   const startDateRaw = String(formData.get("startDate") ?? "").trim();
   const endDateRaw = String(formData.get("endDate") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim() || null;
 
+  if (!coachId) {
+    return { error: "Missing coach id." };
+  }
   if (!startDateRaw) {
     return { error: "Choose a start date." };
   }
@@ -77,7 +87,7 @@ export async function createBlockedDate(
     return { error: "End date must be on or after the start date." };
   }
 
-  await prisma.blockedDate.create({ data: { startDate, endDate, reason } });
+  await prisma.blockedDate.create({ data: { coachId, startDate, endDate, reason } });
 
   revalidatePath("/bookings");
   revalidatePath("/book");

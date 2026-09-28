@@ -11,8 +11,10 @@ const labelClasses =
   "mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted";
 
 export function BookingForm({
+  coachId,
   slots,
 }: {
+  coachId: string;
   slots: { value: string; label: string }[];
 }) {
   const [state, formAction, pending] = useActionState(
@@ -51,6 +53,7 @@ export function BookingForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="coachId" value={coachId} />
       <div>
         <label htmlFor="slot" className={labelClasses}>
           Choose a time

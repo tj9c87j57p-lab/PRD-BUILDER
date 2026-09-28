@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       reminderSentAt: null,
       startAt: { gte: windowStart, lte: windowEnd },
     },
-    include: { contact: true },
+    include: { contact: true, coach: true },
   });
 
   for (const booking of bookings) {
@@ -34,11 +34,12 @@ export async function GET(request: NextRequest) {
     await sendEmail({
       to: booking.contact.email,
       subject: "Reminder: your upcoming call",
-      html: `<p>Hi ${booking.contact.name},</p><p>Just a reminder — your call is coming up on ${booking.startAt.toLocaleString()}.</p>${
+      html: `<p>Hi ${booking.contact.name},</p><p>Just a reminder — your call with ${booking.coach.name} is coming up on ${booking.startAt.toLocaleString()}.</p>${
         booking.googleMeetLink
           ? `<p>Join by Google Meet: <a href="${booking.googleMeetLink}">${booking.googleMeetLink}</a></p>`
           : ""
       }`,
+      replyTo: booking.coach.email,
     });
 
     await prisma.booking.update({
