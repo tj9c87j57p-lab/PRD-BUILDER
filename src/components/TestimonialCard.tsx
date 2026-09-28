@@ -4,7 +4,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   const hasPhotos = testimonial.beforePhotoUrl || testimonial.afterPhotoUrl;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-surface">
+    <div className="overflow-hidden rounded-lg border border-border bg-surface transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg hover:shadow-black/20">
       {hasPhotos ? (
         <div className="grid grid-cols-2">
           <PhotoSlot url={testimonial.beforePhotoUrl} label="Before" />
@@ -12,8 +12,11 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
         </div>
       ) : null}
       <div className="p-5">
-        <p className="text-sm text-foreground">&ldquo;{testimonial.quote}&rdquo;</p>
-        <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted">
+        <p className="text-sm leading-relaxed text-foreground">
+          &ldquo;{testimonial.quote}&rdquo;
+        </p>
+        <p className="mt-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+          <span className="h-px w-3 bg-accent" aria-hidden />
           {testimonial.clientName}
         </p>
       </div>

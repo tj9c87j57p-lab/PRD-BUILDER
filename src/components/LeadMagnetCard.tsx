@@ -16,7 +16,7 @@ export function LeadMagnetCard({ leadMagnet }: { leadMagnet: LeadMagnet }) {
   );
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-surface">
+    <div className="overflow-hidden rounded-lg border border-border bg-surface transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg hover:shadow-black/20">
       {leadMagnet.coverImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
