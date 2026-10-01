@@ -31,6 +31,9 @@ export async function createBooking(
   if (!email) {
     return { error: "Enter your email." };
   }
+  if (!phone) {
+    return { error: "Enter your phone number." };
+  }
   if (!slotRaw) {
     return { error: "Choose a time." };
   }

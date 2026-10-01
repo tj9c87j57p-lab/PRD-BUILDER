@@ -83,7 +83,8 @@ export function BookingForm({
       <input
         type="tel"
         name="phone"
-        placeholder="Phone (optional)"
+        placeholder="Phone"
+        required
         className={fieldClasses}
       />
       {state.error ? <p className="text-xs text-red-400">{state.error}</p> : null}
