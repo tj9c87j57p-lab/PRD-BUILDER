@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Precision Coach CRM",
-  description: "Precision Coach client and pipeline management.",
+  title: "Precision Coach",
+  description: "Online & in-person health and fitness coaching.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
