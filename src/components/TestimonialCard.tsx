@@ -27,16 +27,16 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 function PhotoSlot({ url, label }: { url: string | null; label: string }) {
   if (!url) {
     return (
-      <div className="flex h-40 items-center justify-center bg-background text-xs text-muted">
+      <div className="flex h-52 items-center justify-center bg-background text-xs text-muted">
         {label}
       </div>
     );
   }
 
   return (
-    <div className="relative h-40">
+    <div className="relative h-52 bg-background">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt={label} className="h-full w-full object-cover" />
+      <img src={url} alt={label} className="h-full w-full object-contain" />
       <span className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
         {label}
       </span>
