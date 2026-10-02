@@ -5,6 +5,7 @@ import { SLOT_MINUTES, hasOverlappingBooking } from "@/lib/booking";
 import { createCalendarEvent } from "@/lib/googleCalendar";
 import { sendEmail } from "@/lib/email";
 import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
+import { formatInBusinessTimezone } from "@/lib/timezone";
 
 export interface CreateBookingState {
   error?: string;
@@ -112,7 +113,7 @@ export async function createBooking(
     await logActivity(
       contactId,
       ACTIVITY_TYPES.BOOKING_CREATED,
-      `Booked a call for ${startAt.toLocaleString()}`
+      `Booked a call for ${formatInBusinessTimezone(startAt)}`
     );
   } catch (error) {
     if (error instanceof Error && error.message === "SLOT_TAKEN") {
@@ -151,7 +152,7 @@ export async function createBooking(
     await sendEmail({
       to: email,
       subject: "Your call is booked",
-      html: `<p>Hi ${name},</p><p>Your call with ${coach.name} is confirmed for ${startAt.toLocaleString()}.</p>${
+      html: `<p>Hi ${name},</p><p>Your call with ${coach.name} is confirmed for ${formatInBusinessTimezone(startAt)}.</p>${
         meetLink
           ? `<p>Join by Google Meet: <a href="${meetLink}">${meetLink}</a></p>`
           : ""

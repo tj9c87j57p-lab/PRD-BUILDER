@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getAvailableSlots } from "@/lib/booking";
+import { BUSINESS_TIMEZONE } from "@/lib/timezone";
 import { BookingForm } from "@/components/BookingForm";
 
 // The slot list depends on the current wall-clock time (past slots drop off,
@@ -10,8 +11,14 @@ import { BookingForm } from "@/components/BookingForm";
 // this page must render fresh on every request, not be statically prerendered.
 export const dynamic = "force-dynamic";
 
+// This renders server-side (Vercel runs in UTC), not in the visitor's
+// browser — so the timezone must be pinned explicitly to the business's own
+// (Central/Louisiana), with an explicit zone abbreviation, rather than
+// relying on either the server's or the visitor's local timezone.
 function formatSlotLabel(date: Date): string {
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
+    timeZone: BUSINESS_TIMEZONE,
+    timeZoneName: "short",
     weekday: "short",
     month: "short",
     day: "numeric",

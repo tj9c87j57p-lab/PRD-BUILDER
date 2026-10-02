@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
+import { formatInBusinessTimezone } from "@/lib/timezone";
 
 const DAY_NAMES = [
   "Sunday",
@@ -120,7 +121,7 @@ export async function cancelBooking(id: string): Promise<{ error?: string }> {
   await logActivity(
     booking.contactId,
     ACTIVITY_TYPES.BOOKING_CANCELLED,
-    `Cancelled call scheduled for ${booking.startAt.toLocaleString()}`
+    `Cancelled call scheduled for ${formatInBusinessTimezone(booking.startAt)}`
   );
 
   revalidatePath("/bookings");

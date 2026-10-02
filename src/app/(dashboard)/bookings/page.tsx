@@ -5,6 +5,7 @@ import { AvailabilityForm } from "@/components/AvailabilityForm";
 import { BlockedDateForm } from "@/components/BlockedDateForm";
 import { DeleteBlockedDateButton } from "@/components/DeleteBlockedDateButton";
 import { CancelBookingButton } from "@/components/CancelBookingButton";
+import { formatInBusinessTimezone } from "@/lib/timezone";
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString(undefined, {
@@ -18,11 +19,11 @@ function formatDateRange(start: Date, end: Date): string {
   return startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`;
 }
 
+// This renders server-side (Vercel runs in UTC), so the actual call time
+// must be pinned to the business's own timezone explicitly — the server's
+// local time isn't the business's, and there's no per-admin browser here.
 function formatBookingTime(date: Date): string {
-  return new Date(date).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  return formatInBusinessTimezone(new Date(date));
 }
 
 export default async function BookingsPage({

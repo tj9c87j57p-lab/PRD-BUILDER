@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { zonedTimeToUtc, getZonedYMD, BUSINESS_TIMEZONE } from "@/lib/timezone";
 
 export const SLOT_MINUTES = 30;
 export const BOOKING_WINDOW_DAYS = 14;
@@ -18,13 +19,29 @@ function parseTimeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
+// Advances a {year, month, day} triple by `days`, using a UTC-anchored Date
+// purely as a calendar calculator — this never represents a real instant,
+// just lets JS handle month/year rollover correctly.
+function addDays(
+  ymd: { year: number; month: number; day: number },
+  days: number
+): { year: number; month: number; day: number } {
+  const d = new Date(Date.UTC(ymd.year, ymd.month, ymd.day + days));
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth(), day: d.getUTCDate() };
+}
+
 export async function getAvailableSlots(coachId: string): Promise<AvailableSlot[]> {
   const now = new Date();
+  // "Today" and each subsequent day must be computed in the business's own
+  // timezone (Louisiana/Central), not the server's (Vercel runs in UTC) —
+  // otherwise both the day-of-week lookup and the slot times end up wrong.
+  const todayInBusinessTz = getZonedYMD(now, BUSINESS_TIMEZONE);
   const windowStart = now;
+  const windowEndYmd = addDays(todayInBusinessTz, BOOKING_WINDOW_DAYS);
   const windowEnd = dateOnlyFromYMD(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + BOOKING_WINDOW_DAYS
+    windowEndYmd.year,
+    windowEndYmd.month,
+    windowEndYmd.day
   );
 
   const [windows, blockedDates, bookings] = await Promise.all([
@@ -43,13 +60,9 @@ export async function getAvailableSlots(coachId: string): Promise<AvailableSlot[
   const slots: AvailableSlot[] = [];
 
   for (let offset = 0; offset < BOOKING_WINDOW_DAYS; offset++) {
-    const dayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
-    const dayKey = dateOnlyFromYMD(
-      dayLocal.getFullYear(),
-      dayLocal.getMonth(),
-      dayLocal.getDate()
-    );
-    const dayOfWeek = dayLocal.getDay();
+    const dayYmd = addDays(todayInBusinessTz, offset);
+    const dayKey = dateOnlyFromYMD(dayYmd.year, dayYmd.month, dayYmd.day);
+    const dayOfWeek = new Date(Date.UTC(dayYmd.year, dayYmd.month, dayYmd.day)).getUTCDay();
 
     const isBlocked = blockedDates.some((b) => {
       const start = dateOnlyFromYMD(
@@ -72,12 +85,13 @@ export async function getAvailableSlots(coachId: string): Promise<AvailableSlot[
       const endMinutes = parseTimeToMinutes(window.endTime);
 
       for (let m = startMinutes; m + SLOT_MINUTES <= endMinutes; m += SLOT_MINUTES) {
-        const slotStart = new Date(
-          dayLocal.getFullYear(),
-          dayLocal.getMonth(),
-          dayLocal.getDate(),
-          0,
-          m
+        const slotStart = zonedTimeToUtc(
+          dayYmd.year,
+          dayYmd.month,
+          dayYmd.day,
+          Math.floor(m / 60),
+          m % 60,
+          BUSINESS_TIMEZONE
         );
         const slotEnd = new Date(slotStart.getTime() + SLOT_MINUTES * 60 * 1000);
 

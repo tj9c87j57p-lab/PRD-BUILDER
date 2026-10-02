@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { formatInBusinessTimezone } from "@/lib/timezone";
 
 export async function GET(request: NextRequest) {
   // Vercel Cron automatically sends `Authorization: Bearer <CRON_SECRET>`
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     await sendEmail({
       to: booking.contact.email,
       subject: "Reminder: your upcoming call",
-      html: `<p>Hi ${booking.contact.name},</p><p>Just a reminder — your call with ${booking.coach.name} is coming up on ${booking.startAt.toLocaleString()}.</p>${
+      html: `<p>Hi ${booking.contact.name},</p><p>Just a reminder — your call with ${booking.coach.name} is coming up on ${formatInBusinessTimezone(booking.startAt)}.</p>${
         booking.googleMeetLink
           ? `<p>Join by Google Meet: <a href="${booking.googleMeetLink}">${booking.googleMeetLink}</a></p>`
           : ""
