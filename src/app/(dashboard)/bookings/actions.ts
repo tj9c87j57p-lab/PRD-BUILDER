@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { logActivity, ACTIVITY_TYPES } from "@/lib/activity";
 import { formatInBusinessTimezone } from "@/lib/timezone";
+import { createCalendarEvent } from "@/lib/googleCalendar";
 
 const DAY_NAMES = [
   "Sunday",
@@ -127,5 +128,51 @@ export async function cancelBooking(id: string): Promise<{ error?: string }> {
   revalidatePath("/bookings");
   revalidatePath("/book");
   revalidatePath(`/contacts/${booking.contactId}`);
+  return {};
+}
+
+// Backfills a calendar event for a booking that was created while the
+// coach's Google refresh token was expired/missing, so it never got
+// pushed at booking time. Safe to call on a booking that already has one.
+export async function syncBookingToCalendar(id: string): Promise<{ error?: string }> {
+  if (!id) {
+    return { error: "Missing booking id." };
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: { id },
+    include: { contact: true, coach: true },
+  });
+  if (!booking) {
+    return { error: "Booking not found." };
+  }
+  if (booking.cancelledAt) {
+    return { error: "This booking was cancelled." };
+  }
+
+  try {
+    const event = await createCalendarEvent({
+      summary: `Call with ${booking.contact.name}`,
+      description: `Booked via the website. Contact: ${booking.contact.email}${
+        booking.contact.phone ? `, ${booking.contact.phone}` : ""
+      }`,
+      startAt: booking.startAt,
+      endAt: booking.endAt,
+      attendeeEmail: booking.contact.email ?? undefined,
+      coachRefreshToken: booking.coach.googleRefreshToken,
+    });
+    if (!event?.eventId) {
+      return { error: "Calendar isn't connected for this coach yet." };
+    }
+    await prisma.booking.update({
+      where: { id },
+      data: { googleCalendarEventId: event.eventId, googleMeetLink: event.meetLink },
+    });
+  } catch (error) {
+    console.error("[bookings] manual calendar sync failed:", error);
+    return { error: "Google Calendar push failed. Check the server logs." };
+  }
+
+  revalidatePath("/bookings");
   return {};
 }

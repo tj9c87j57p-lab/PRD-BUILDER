@@ -5,6 +5,7 @@ import { AvailabilityForm } from "@/components/AvailabilityForm";
 import { BlockedDateForm } from "@/components/BlockedDateForm";
 import { DeleteBlockedDateButton } from "@/components/DeleteBlockedDateButton";
 import { CancelBookingButton } from "@/components/CancelBookingButton";
+import { SyncToCalendarButton } from "@/components/SyncToCalendarButton";
 import { formatInBusinessTimezone } from "@/lib/timezone";
 
 function formatDate(date: Date): string {
@@ -150,8 +151,18 @@ export default async function BookingsPage({
                     {formatBookingTime(booking.startAt)}
                     {booking.contact.email ? ` — ${booking.contact.email}` : ""}
                   </p>
+                  {!booking.googleCalendarEventId ? (
+                    <p className="mt-1 text-xs text-amber-500">
+                      Not on Google Calendar
+                    </p>
+                  ) : null}
                 </div>
-                <CancelBookingButton id={booking.id} />
+                <div className="flex items-center gap-2">
+                  {!booking.googleCalendarEventId ? (
+                    <SyncToCalendarButton id={booking.id} />
+                  ) : null}
+                  <CancelBookingButton id={booking.id} />
+                </div>
               </div>
             ))
           )}
