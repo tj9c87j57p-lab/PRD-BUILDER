@@ -2,7 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getIronSession, nextProxyCookies } from "iron-session";
 import { sessionOptions, type SessionData } from "@/lib/session";
 
-const PUBLIC_PATHS = new Set(["/", "/login", "/book", "/api/reminders", "/logo.jpg"]);
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/login",
+  "/book",
+  "/api/reminders",
+  "/logo.jpg",
+  "/privacy",
+  "/terms",
+]);
 
 function isPublicPath(pathname: string): boolean {
   return (
