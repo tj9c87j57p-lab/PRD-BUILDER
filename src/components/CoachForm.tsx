@@ -79,13 +79,11 @@ export function CoachForm({ coach }: { coach?: Coach }) {
             className={`${fieldClasses} font-mono text-xs`}
           />
           <p className="mt-1 text-xs text-muted">
-            Get this from Google&apos;s OAuth Playground
-            (developers.google.com/oauthplayground): use your own OAuth
-            credentials (this app&apos;s Client ID/Secret), authorize the
-            Calendar scope signed into this coach&apos;s Google account, then
-            exchange for tokens and paste the refresh token here. Without
-            this, bookings for this coach won&apos;t push to a calendar or
-            get a Google Meet link.
+            Easiest: use &quot;Connect Google Calendar&quot; on the Coaches
+            list and sign in as this coach. Or paste a refresh token from
+            Google&apos;s OAuth Playground here. Without one, bookings for
+            this coach won&apos;t push to a calendar or get a Google Meet
+            link.
           </p>
         </div>
 

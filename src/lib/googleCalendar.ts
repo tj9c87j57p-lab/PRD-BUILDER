@@ -1,5 +1,44 @@
 import { google } from "googleapis";
 
+const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
+
+// The redirect URI must be listed under "Authorized redirect URIs" on the
+// OAuth client in Google Cloud Console.
+function getOAuthClient(redirectUri: string) {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) return null;
+  return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+}
+
+export function getGoogleAuthUrl(input: {
+  redirectUri: string;
+  state: string;
+  loginHint?: string;
+}): string | null {
+  const auth = getOAuthClient(input.redirectUri);
+  if (!auth) return null;
+  return auth.generateAuthUrl({
+    access_type: "offline",
+    // Force the consent screen so Google always returns a refresh token,
+    // even if this account authorized the app before.
+    prompt: "consent",
+    scope: [CALENDAR_SCOPE],
+    state: input.state,
+    login_hint: input.loginHint,
+  });
+}
+
+export async function exchangeCodeForRefreshToken(input: {
+  redirectUri: string;
+  code: string;
+}): Promise<string | null> {
+  const auth = getOAuthClient(input.redirectUri);
+  if (!auth) return null;
+  const { tokens } = await auth.getToken(input.code);
+  return tokens.refresh_token ?? null;
+}
+
 function getCalendarClient(coachRefreshToken?: string | null) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;

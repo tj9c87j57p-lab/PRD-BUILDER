@@ -2,7 +2,21 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ToggleCoachButton } from "@/components/ToggleCoachButton";
 
-export default async function CoachesPage() {
+const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
+  "not-configured":
+    "GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET aren't set on the server.",
+  "state-mismatch": "The sign-in link expired or was reused. Try again.",
+  access_denied: "Google access was cancelled.",
+  "token-exchange-failed":
+    "Google didn't return a refresh token. Check the server logs and try again.",
+};
+
+export default async function CoachesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ google?: string; reason?: string }>;
+}) {
+  const { google, reason } = await searchParams;
   const coaches = await prisma.coach.findMany({
     orderBy: { createdAt: "asc" },
   });
@@ -20,6 +34,18 @@ export default async function CoachesPage() {
           Add Coach
         </Link>
       </div>
+
+      {google === "connected" ? (
+        <p className="mt-4 rounded-md border border-border bg-surface px-4 py-3 text-sm text-foreground">
+          Google Calendar connected. New bookings will go to that coach&apos;s
+          calendar.
+        </p>
+      ) : google === "error" ? (
+        <p className="mt-4 rounded-md border border-border bg-surface px-4 py-3 text-sm text-red-400">
+          Couldn&apos;t connect Google Calendar.{" "}
+          {(reason && GOOGLE_ERROR_MESSAGES[reason]) ?? "Please try again."}
+        </p>
+      ) : null}
 
       <div className="mt-6 flex flex-col gap-3">
         {coaches.length === 0 ? (
@@ -42,6 +68,15 @@ export default async function CoachesPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                {/* Plain <a>: this hits a route handler that redirects off-site to Google. */}
+                <a
+                  href={`/api/google/connect?coachId=${coach.id}`}
+                  className="text-sm text-muted hover:text-foreground"
+                >
+                  {coach.googleRefreshToken
+                    ? "Reconnect Google"
+                    : "Connect Google Calendar"}
+                </a>
                 <Link
                   href={`/coaches/${coach.id}/edit`}
                   className="text-sm text-muted hover:text-foreground"
