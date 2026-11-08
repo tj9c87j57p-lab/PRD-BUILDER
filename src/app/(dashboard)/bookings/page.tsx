@@ -33,32 +33,38 @@ export default async function BookingsPage({
   searchParams: Promise<{ coach?: string }>;
 }) {
   const { coach: coachParam } = await searchParams;
+  const isAllView = coachParam === "all";
 
   const coaches = await prisma.coach.findMany({ orderBy: { createdAt: "asc" } });
-  const selectedCoach =
-    coaches.find((c) => c.id === coachParam) ?? coaches[0] ?? null;
+  const selectedCoach = isAllView
+    ? null
+    : coaches.find((c) => c.id === coachParam) ?? coaches[0] ?? null;
 
-  if (!selectedCoach) {
+  if (!isAllView && !selectedCoach) {
     notFound();
   }
 
   const [windows, blockedDates, upcomingBookings] = await Promise.all([
-    prisma.availabilityWindow.findMany({
-      where: { coachId: selectedCoach.id },
-      orderBy: { dayOfWeek: "asc" },
-    }),
-    prisma.blockedDate.findMany({
-      where: { coachId: selectedCoach.id },
-      orderBy: { startDate: "asc" },
-    }),
+    selectedCoach
+      ? prisma.availabilityWindow.findMany({
+          where: { coachId: selectedCoach.id },
+          orderBy: { dayOfWeek: "asc" },
+        })
+      : Promise.resolve([]),
+    selectedCoach
+      ? prisma.blockedDate.findMany({
+          where: { coachId: selectedCoach.id },
+          orderBy: { startDate: "asc" },
+        })
+      : Promise.resolve([]),
     prisma.booking.findMany({
       where: {
-        coachId: selectedCoach.id,
+        coachId: selectedCoach?.id,
         cancelledAt: null,
         startAt: { gte: new Date() },
       },
       orderBy: { startAt: "asc" },
-      include: { contact: true },
+      include: { contact: true, coach: true },
     }),
   ]);
 
@@ -80,7 +86,7 @@ export default async function BookingsPage({
               key={c.id}
               href={`/bookings?coach=${c.id}`}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                c.id === selectedCoach.id
+                !isAllView && c.id === selectedCoach?.id
                   ? "bg-accent text-accent-foreground"
                   : "border border-border text-muted hover:text-foreground"
               }`}
@@ -88,47 +94,66 @@ export default async function BookingsPage({
               {c.name}
             </Link>
           ))}
+          <Link
+            href="/bookings?coach=all"
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              isAllView
+                ? "bg-accent text-accent-foreground"
+                : "border border-border text-muted hover:text-foreground"
+            }`}
+          >
+            All coaches
+          </Link>
         </div>
       ) : null}
 
-      <AvailabilityForm coachId={selectedCoach.id} windows={windows} />
+      {selectedCoach ? (
+        <>
+          <AvailabilityForm coachId={selectedCoach.id} windows={windows} />
 
-      <section className="w-full rounded-lg border border-border bg-surface p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">
-          Blocked dates
-        </h2>
-        <p className="mt-1 text-xs text-muted">
-          Vacation or one-off days {selectedCoach.name} is unavailable, even
-          during their usual hours.
+          <section className="w-full rounded-lg border border-border bg-surface p-6">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              Blocked dates
+            </h2>
+            <p className="mt-1 text-xs text-muted">
+              Vacation or one-off days {selectedCoach.name} is unavailable, even
+              during their usual hours.
+            </p>
+
+            <div className="mt-4">
+              <BlockedDateForm coachId={selectedCoach.id} />
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2">
+              {blockedDates.length === 0 ? (
+                <p className="text-sm text-muted">No blocked dates.</p>
+              ) : (
+                blockedDates.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between rounded-md border border-border px-4 py-2"
+                  >
+                    <div>
+                      <p className="text-sm text-foreground">
+                        {formatDateRange(b.startDate, b.endDate)}
+                      </p>
+                      {b.reason ? (
+                        <p className="text-xs text-muted">{b.reason}</p>
+                      ) : null}
+                    </div>
+                    <DeleteBlockedDateButton id={b.id} />
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        </>
+      ) : (
+        <p className="text-sm text-muted">
+          Showing upcoming calls for every coach. Select a coach above to
+          manage their availability and blocked dates.
         </p>
-
-        <div className="mt-4">
-          <BlockedDateForm coachId={selectedCoach.id} />
-        </div>
-
-        <div className="mt-4 flex flex-col gap-2">
-          {blockedDates.length === 0 ? (
-            <p className="text-sm text-muted">No blocked dates.</p>
-          ) : (
-            blockedDates.map((b) => (
-              <div
-                key={b.id}
-                className="flex items-center justify-between rounded-md border border-border px-4 py-2"
-              >
-                <div>
-                  <p className="text-sm text-foreground">
-                    {formatDateRange(b.startDate, b.endDate)}
-                  </p>
-                  {b.reason ? (
-                    <p className="text-xs text-muted">{b.reason}</p>
-                  ) : null}
-                </div>
-                <DeleteBlockedDateButton id={b.id} />
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+      )}
 
       <section>
         <h2 className="text-lg font-semibold tracking-tight text-foreground">
@@ -148,7 +173,7 @@ export default async function BookingsPage({
                     {booking.contact.name}
                   </p>
                   <p className="mt-1 text-xs text-muted">
-                    {formatBookingTime(booking.startAt)}
+                    {formatBookingTime(booking.startAt)} with {booking.coach.name}
                     {booking.contact.email ? ` — ${booking.contact.email}` : ""}
                   </p>
                   {!booking.googleCalendarEventId ? (
